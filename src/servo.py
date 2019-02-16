@@ -3,21 +3,27 @@ import rospy
 import time
 import wiringpi
 from std_msgs.msg import String
+import math
+from geometry_msgs.msg import Twist
 
-def callback(data):
-	wiringpi.pwmWrite(18, 100)
-	rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+def callback(msg):
+	# msg.linear.x  # -0.2 0.2 ish m/s
+	# msg.angular.z  # rad/s  -1 1/ 
+
+	wiringpi.pwmWrite(18, math.floor(150 + msg.linear.x * 10))
+
+	rospy.loginfo("desired cmd_vel x is  {}  ang z is  {}".format(msg.linear.x,msg.angular.z))
     
-def listener():
+def setup():
 
     # In ROS, nodes are uniquely named. If two nodes with the same
     # node are launched, the previous one is kicked off. The
     # anonymous=True flag means that rospy will choose a unique
     # name for our 'listener' node so that multiple listeners can
     # run simultaneously.
-	rospy.init_node('listener', anonymous=True)
+	rospy.init_node('motor_control', anonymous=True)
 
-	rospy.Subscriber("chatter", String, callback)
+	rospy.Subscriber("cmd_vel", Twist, callback)
 	# use 'GPIO naming'
 	wiringpi.wiringPiSetupGpio()
  
@@ -31,11 +37,8 @@ def listener():
 	wiringpi.pwmSetClock(192)
 	wiringpi.pwmSetRange(2000)
  
-	delay_period = 0.01
-   	 # spin() simply keeps python from exiting until this node is stopped
-    	rospy.spin()
+	delay_period = 0.01  
 
 if __name__ == '__main__':
-    listener()
-
-
+	setup()	
+	rospy.spin()
