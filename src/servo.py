@@ -9,8 +9,12 @@ from geometry_msgs.msg import Twist
 def callback(msg):
 	# msg.linear.x  # -0.2 0.2 ish m/s
 	# msg.angular.z  # rad/s  -1 1/ 
+	# assuming left wheel on pin 18 , and right wheel on in 19
 
-	wiringpi.pwmWrite(18, math.floor(150 + msg.linear.x * 10))
+	msg.linear.x=min(msg.linear.x,0.2)
+
+	wiringpi.pwmWrite(18, math.floor(150 +    (msg.linear.x * 10 - msg.angualr.z*10/2)))
+	wiringpi.pwmWrite(19, math.floor(150 - (msg.linear.x * 10 + msg.angualr.z*10/2))
 
 	rospy.loginfo("desired cmd_vel x is  {}  ang z is  {}".format(msg.linear.x,msg.angular.z))
     
