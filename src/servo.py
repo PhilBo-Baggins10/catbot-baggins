@@ -45,7 +45,7 @@ class MotorControl(object):
 		ms_value_r=min(2000,max(1000,ms_value_r))		
 		
 		self.left_servo.set_ms(msg.angular.z)
-		self.right_servo.set_ms(ms_value_r)		
+		# self.right_servo.set_ms(ms_value_r)		
 		rospy.loginfo("desired cmd_vel x is  {}  ang z is  {}".format(msg.linear.x,msg.angular.z))		
 
 if __name__ == '__main__':	
