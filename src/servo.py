@@ -18,10 +18,10 @@ class MotorControl(object):
 			self.pwm.stop(0)	
 		
 		def set_ms(self, ms):
-			ms=min(max(1000,ms),2000)
+			# ms=min(max(1000,ms),2000)
 			period=(float)(1000/self.freq)
 			rospy.loginfo((float)(ms/period)*100.0)			
-			self.pwm.ChangeDutyCycle(ms/period)	
+			self.pwm.ChangeDutyCycle(ms)	
 
 	def __init__(self):
 		rospy.init_node('motor_control', anonymous=True)
@@ -44,7 +44,7 @@ class MotorControl(object):
 		ms_value_l=min(2000,max(1000,ms_value_l))
 		ms_value_r=min(2000,max(1000,ms_value_r))		
 		
-		self.left_servo.set_ms(ms_value_l)
+		self.left_servo.set_ms(msg.angular.z)
 		self.right_servo.set_ms(ms_value_r)		
 		rospy.loginfo("desired cmd_vel x is  {}  ang z is  {}".format(msg.linear.x,msg.angular.z))		
 
