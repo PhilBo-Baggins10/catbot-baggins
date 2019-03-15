@@ -26,7 +26,7 @@ class MotorControl(object):
 	def __init__(self):
 		rospy.init_node('motor_control', anonymous=True)
 		self.sub=rospy.Subscriber("cmd_vel", Twist, self.callback)
-		GPIO.setmode(GPIO.BOARD)
+		GPIO.setmode(GPIO.BCM)
 		self.left_servo=MotorControl.Servo(18)	
 		self.right_servo=MotorControl.Servo(19)					
 
