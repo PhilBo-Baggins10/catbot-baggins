@@ -50,3 +50,4 @@ class MotorControl(object):
 if __name__ == '__main__':	
 	mt_ctrl=MotorControl()
 	rospy.spin()
+	GPIO.cleanup()
