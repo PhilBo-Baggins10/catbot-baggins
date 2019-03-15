@@ -26,13 +26,13 @@ class MotorControl(object):
 		rospy.init_node('motor_control', anonymous=True)
 		self.sub=rospy.Subscriber("cmd_vel", Twist, self.callback)
 		GPIO.setmode(GPIO.BOARD)
-		self.left_servo=MotorControl.Servo(17)	
-		self.right_servo=MotorControl.Servo(18)					
+		self.left_servo=MotorControl.Servo(18)	
+		self.right_servo=MotorControl.Servo(19)					
 
 	def __del__(self):	
 		GPIO.cleanup()
 
-	def callback(self,msg):
+	def callback(self, msg):
 		# msg.linear.x  # -0.2 0.2 ish m/s
 		# msg.angular.z  # rad/s  -1 1/ 
 		# assuming left wheel on pin 18 , and right wheel on in 19
@@ -43,8 +43,8 @@ class MotorControl(object):
 		ms_value_l=min(2000,max(1000,ms_value_l))
 		ms_value_r=min(2000,max(1000,ms_value_r))		
 		
-		self.left_servo.set_servo(ms_value_l)
-		self.right_servo.set_servo(ms_value_r)		
+		self.left_servo.set_ms(ms_value_l)
+		self.right_servo.set_ms(ms_value_r)		
 		rospy.loginfo("desired cmd_vel x is  {}  ang z is  {}".format(msg.linear.x,msg.angular.z))		
 
 if __name__ == '__main__':	
