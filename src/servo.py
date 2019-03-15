@@ -18,7 +18,7 @@ class MotorControl(object):
 			self.pwm.stop(0)	
 		
 		def set_ms(self, ms):
-			ms=min(max(1000),2000)
+			ms=min(max(1000,ms),2000)
 			period=(int)(1000/self.freq)			
 			self.pwm.ChangeDutyCycle(ms/period)	
 
