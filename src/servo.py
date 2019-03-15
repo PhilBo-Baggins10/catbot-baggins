@@ -1,48 +1,37 @@
 #!/usr/bin/env python
 import rospy
 import time
-import wiringpi
-from std_msgs.msg import String
 import math
+from RPIO import PWM
 from geometry_msgs.msg import Twist
 
-def callback(msg):
-	# msg.linear.x  # -0.2 0.2 ish m/s
-	# msg.angular.z  # rad/s  -1 1/ 
-	# assuming left wheel on pin 18 , and right wheel on in 19
+class MotorControl(Object):
 
-	msg.linear.x=min(msg.linear.x,0.2)
+	def __init__(self):
+		rospy.init_node('motor_control', anonymous=True)
+		self.sub=rospy.Subscriber("cmd_vel", Twist, self.callback) 				
+		self.servo = PWM.Servo()		
 
-	wiringpi.pwmWrite(18, math.floor(150 +    (msg.linear.x * 10 - msg.angualr.z*10/2)))
-	wiringpi.pwmWrite(19, math.floor(150 - (msg.linear.x * 10 + msg.angualr.z*10/2))
+	def callback(self,msg):
+		# msg.linear.x  # -0.2 0.2 ish m/s
+		# msg.angular.z  # rad/s  -1 1/ 
+		# assuming left wheel on pin 18 , and right wheel on in 19
+		
+		ms_value_l = math.floor(1500 + (msg.linear.x * 100 - msg.angualr.z*100/2) )
+		ms_value_r = math.floor(1500 + (msg.linear.x * 100 - msg.angualr.z*100/2) )
 
-	rospy.loginfo("desired cmd_vel x is  {}  ang z is  {}".format(msg.linear.x,msg.angular.z))
-    
-def setup():
+		ms_value_l=min(2000,max(1000,ms_value_l))
+		ms_value_r=min(2000,max(1000,ms_value_r))		
+		
+		self.servo.set_servo(17, ms_value_l)
+		self.servo.set_servo(18, ms_value_r)
+		
+		# self.servo.stop_servo(18)
+		# self.servo.stop_servo(19)
 
-    # In ROS, nodes are uniquely named. If two nodes with the same
-    # node are launched, the previous one is kicked off. The
-    # anonymous=True flag means that rospy will choose a unique
-    # name for our 'listener' node so that multiple listeners can
-    # run simultaneously.
-	rospy.init_node('motor_control', anonymous=True)
-
-	rospy.Subscriber("cmd_vel", Twist, callback)
-	# use 'GPIO naming'
-	wiringpi.wiringPiSetupGpio()
- 
-	# set #18 to be a PWM output
-	wiringpi.pinMode(18, wiringpi.GPIO.PWM_OUTPUT)
- 
-	# set the PWM mode to milliseconds stype
-	wiringpi.pwmSetMode(wiringpi.GPIO.PWM_MODE_MS)
- 
-	# divide down clock
-	wiringpi.pwmSetClock(192)
-	wiringpi.pwmSetRange(2000)
- 
-	delay_period = 0.01  
+		rospy.loginfo("desired cmd_vel x is  {}  ang z is  {}".format(msg.linear.x,msg.angular.z))		
 
 if __name__ == '__main__':
-	setup()	
+	PWM.setup()
+	mt_ctrl=MotorControl()
 	rospy.spin()
