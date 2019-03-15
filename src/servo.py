@@ -5,9 +5,9 @@ import math
 import RPi.GPIO as GPIO
 from geometry_msgs.msg import Twist
 
-class MotorControl(Object):
+class MotorControl(object):
 
-	class Servo(Object):
+	class Servo(object):
 		def __init__(self,pin,freq=50):		
 			GPIO.setup(pin, GPIO.OUT)
 			self.freq=freq
