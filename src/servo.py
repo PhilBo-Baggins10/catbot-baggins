@@ -37,8 +37,8 @@ class MotorControl(object):
 		# msg.angular.z  # rad/s  -1 1/ 
 		# assuming left wheel on pin 18 , and right wheel on in 19
 		
-		ms_value_l = math.floor(1500 + (msg.linear.x * 100 - msg.angualr.z*100/2) )
-		ms_value_r = math.floor(1500 + (msg.linear.x * 100 - msg.angualr.z*100/2) )
+		ms_value_l = math.floor(1500 + (msg.linear.x * 100 - msg.angular.z*100/2) )
+		ms_value_r = math.floor(1500 + (msg.linear.x * 100 - msg.angular.z*100/2) )
 
 		ms_value_l=min(2000,max(1000,ms_value_l))
 		ms_value_r=min(2000,max(1000,ms_value_r))		
