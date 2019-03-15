@@ -19,7 +19,8 @@ class MotorControl(object):
 		
 		def set_ms(self, ms):
 			ms=min(max(1000,ms),2000)
-			period=(int)(1000/self.freq)			
+			period=(float)(1000/self.freq)
+			rospy.loginfo((float)(ms/period)*100.0)			
 			self.pwm.ChangeDutyCycle(ms/period)	
 
 	def __init__(self):
