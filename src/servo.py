@@ -1,48 +1,54 @@
 #!/usr/bin/env python
 import rospy
 import time
-import wiringpi
-from std_msgs.msg import String
 import math
+import RPi.GPIO as GPIO
 from geometry_msgs.msg import Twist
 
-def callback(msg):
-	# msg.linear.x  # -0.2 0.2 ish m/s
-	# msg.angular.z  # rad/s  -1 1/ 
-	# assuming left wheel on pin 18 , and right wheel on in 19
+class MotorControl(object):
 
-	msg.linear.x=min(msg.linear.x,0.2)
+	class Servo(object):
+		def __init__(self,pin,freq=100):		
+			GPIO.setup(pin, GPIO.OUT)
+			self.freq=freq
+			self.pwm=GPIO.PWM(pin, freq)
+			self.pwm.start(0)
 
-	wiringpi.pwmWrite(18, math.floor(150 +    (msg.linear.x * 10 - msg.angualr.z*10/2)))
-	wiringpi.pwmWrite(19, math.floor(150 - (msg.linear.x * 10 + msg.angualr.z*10/2))
+		def __del__(self):
+			self.pwm.stop(0)	
+		
+		def set_ms(self, ms):
+			# ms=min(max(1000,ms),2000)
+			period=(float)(1000/self.freq)
+			rospy.loginfo((float)(ms/period)*100.0)			
+			self.pwm.ChangeDutyCycle(ms)	
 
-	rospy.loginfo("desired cmd_vel x is  {}  ang z is  {}".format(msg.linear.x,msg.angular.z))
-    
-def setup():
+	def __init__(self):
+		rospy.init_node('motor_control', anonymous=True)
+		self.sub=rospy.Subscriber("cmd_vel", Twist, self.callback)
+		GPIO.setmode(GPIO.BCM)
+		self.left_servo=MotorControl.Servo(18)	
+		self.right_servo=MotorControl.Servo(19)					
 
-    # In ROS, nodes are uniquely named. If two nodes with the same
-    # node are launched, the previous one is kicked off. The
-    # anonymous=True flag means that rospy will choose a unique
-    # name for our 'listener' node so that multiple listeners can
-    # run simultaneously.
-	rospy.init_node('motor_control', anonymous=True)
+	def __del__(self):	
+		GPIO.cleanup()
 
-	rospy.Subscriber("cmd_vel", Twist, callback)
-	# use 'GPIO naming'
-	wiringpi.wiringPiSetupGpio()
- 
-	# set #18 to be a PWM output
-	wiringpi.pinMode(18, wiringpi.GPIO.PWM_OUTPUT)
- 
-	# set the PWM mode to milliseconds stype
-	wiringpi.pwmSetMode(wiringpi.GPIO.PWM_MODE_MS)
- 
-	# divide down clock
-	wiringpi.pwmSetClock(192)
-	wiringpi.pwmSetRange(2000)
- 
-	delay_period = 0.01  
+	def callback(self, msg):
+		# msg.linear.x  # -0.2 0.2 ish m/s
+		# msg.angular.z  # rad/s  -1 1/ 
+		# assuming left wheel on pin 18 , and right wheel on in 19
+		
+		ms_value_l = math.floor(1500 + (msg.linear.x * 100 - msg.angular.z*100/2) )
+		ms_value_r = math.floor(1500 + (msg.linear.x * 100 - msg.angular.z*100/2) )
 
-if __name__ == '__main__':
-	setup()	
+		ms_value_l=min(2000,max(1000,ms_value_l))
+		ms_value_r=min(2000,max(1000,ms_value_r))		
+		
+		self.left_servo.set_ms(msg.angular.z)
+		# self.right_servo.set_ms(ms_value_r)		
+		rospy.loginfo("desired cmd_vel x is  {}  ang z is  {}".format(msg.linear.x,msg.angular.z))		
+
+if __name__ == '__main__':	
+	mt_ctrl=MotorControl()
 	rospy.spin()
+	GPIO.cleanup()
