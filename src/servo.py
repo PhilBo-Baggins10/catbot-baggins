@@ -30,8 +30,8 @@ class MotorControl(object):
 		rospy.init_node('motor_control', anonymous=True)
 		self.sub=rospy.Subscriber("cmd_vel", Twist, self.callback)
 		GPIO.setmode(GPIO.BCM)
-		self.left_servo=MotorControl.Servo(18,"left")	
-		self.right_servo=MotorControl.Servo(19,"right")					
+		self.left_servo=MotorControl.Servo(19,"left")	
+		self.right_servo=MotorControl.Servo(18,"right")					
 
 	def __del__(self):	
 		GPIO.cleanup()
