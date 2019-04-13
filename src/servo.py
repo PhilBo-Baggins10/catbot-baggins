@@ -8,7 +8,7 @@ from geometry_msgs.msg import Twist
 class MotorControl(object):
 
 	class Servo(object):
-		def __init__(self,pin,freq=100, name):		
+		def __init__(self,pin,name,freq=100):		
 			GPIO.setup(pin, GPIO.OUT)
 			self.name=name
 			self.freq=freq
