@@ -20,7 +20,7 @@ class MotorControl(object):
 		
 		def set_ms(self, ms):
 			ms=min(max(1.,ms),2.)
-			ms= (not (ms<1.55 and ms>1.45))*ms
+			# ms= (not (ms<1.55 and ms>1.45))*ms
 			
 			period=(float)(1000/self.freq)
 			rospy.loginfo("{} motor is {} % DC and ms is {}".format( self.name,(float)(ms/period)*100.0,ms)	)		
