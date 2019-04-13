@@ -18,10 +18,10 @@ class MotorControl(object):
 			self.pwm.stop(0)	
 		
 		def set_ms(self, ms):
-			# ms=min(max(1000,ms),2000)
+			ms=min(max(1.,ms),2.)
 			period=(float)(1000/self.freq)
 			rospy.loginfo((float)(ms/period)*100.0)			
-			self.pwm.ChangeDutyCycle(ms)	
+			self.pwm.ChangeDutyCycle((float)(ms/period)*100.0)	
 
 	def __init__(self):
 		rospy.init_node('motor_control', anonymous=True)
@@ -39,7 +39,7 @@ class MotorControl(object):
 		# assuming left wheel on pin 18 , and right wheel on in 19
 		
 		ms_value_l = math.floor(1500 + (msg.linear.x * 100 - msg.angular.z*100/2) )
-		ms_value_r = math.floor(1500 + (msg.linear.x * 100 - msg.angular.z*100/2) )
+		ms_value_r = math.floor(1500 + (msg.linear.x * 100 + msg.angular.z*100/2) )
 
 		ms_value_l=(float) min(2000,max(1000,ms_value_l))
 		ms_value_r=(float) min(2000,max(1000,ms_value_r))		
